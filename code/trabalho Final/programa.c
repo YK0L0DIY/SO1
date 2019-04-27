@@ -62,8 +62,11 @@ void blockParaWait(queue *block, queue *wait, struct processo *processos[]) {
                 if (processos[block->Q[i]]->tempo_que_precisa_de_ficar_em_block == 0) {
     //                        printf("id: %d mudei no instante %d para wait de block\n", processos[block->Q[i]]->pcb->id,
     //                        timer);
-                    processos[block->Q[i]]->pcb->estado = 1;
-                    enqueue(dequeue(block), wait);
+                    int prox = dequeue(block);
+                    if (processos[prox]->pcb->estado != -2) {
+                        processos[block->Q[i]]->pcb->estado = 1;
+                        enqueue(prox, wait);
+                    }
                 }
             }
         } else {
@@ -72,8 +75,11 @@ void blockParaWait(queue *block, queue *wait, struct processo *processos[]) {
                 if (processos[block->Q[i]]->tempo_que_precisa_de_ficar_em_block == 0) {
     //                        printf("id: %d mudei no instante %d para wait de block\n", processos[block->Q[i]]->pcb->id,
     //                        timer);
-                    processos[block->Q[i]]->pcb->estado = 1;
-                    enqueue(dequeue(block), wait);
+                    int prox = dequeue(block);
+                    if (processos[prox]->pcb->estado != -2) {
+                        processos[block->Q[i]]->pcb->estado = 1;
+                        enqueue(prox, wait);
+                    }
                 }
             }
             for (int i = 0; i <= block->last; i++) {
@@ -81,8 +87,11 @@ void blockParaWait(queue *block, queue *wait, struct processo *processos[]) {
                 if (processos[block->Q[i]]->tempo_que_precisa_de_ficar_em_block == 0) {
     //                        printf("id: %d mudei no instante %d para wait de block\n", processos[block->Q[i]]->pcb->id,
     //                        timer);
-                    processos[block->Q[i]]->pcb->estado = 1;
-                    enqueue(dequeue(block), wait);
+                    int prox = dequeue(block);
+                    if (processos[prox]->pcb->estado != -2) {
+                        processos[block->Q[i]]->pcb->estado = 1;
+                        enqueue(prox, wait);
+                    }
                 }
             }
         }
@@ -189,6 +198,20 @@ void printEstados(int timer, int p_id, struct processo *processos[]) {
     printf("\n");
 }
 
+void debugPrint(int p_id, struct processo *processos[]) {
+
+    printf("\nPROCESSOS\n");
+    struct processo *aux;
+
+    for (int i = 0; i < p_id; i++) {
+        aux = processos[i];
+        printf("%d estado: %d | instante = %d", aux->pcb->id, aux->pcb->estado, aux->instante);
+        printf("\n");
+    }
+    
+    free(aux);
+}
+
 int main(void) {
 
     int instante, p_id = 0, controlo, n_processos_corridos = 0, timer = 0, processo_em_run = -1, processo_em_exit = -1;
@@ -224,6 +247,9 @@ int main(void) {
 
     while (1) {
 
+        /*
+            IF YOU DON'T WANT THE BLANK LINE MOVE THE IF AFTER THE limparExit() FUNTION.
+        */
         //printf("\ttime: %d\n", timer);
         if (n_processos_corridos == p_id)
             break;
@@ -282,15 +308,8 @@ int main(void) {
 
     }
 
-    //print de todos os processos introduzidos
-    printf("\nPROCESSOS\n");
-    int i = 0;
-    struct processo *aux;
-    while (i < p_id) {
-        aux = processos[i];
-        printf("%d estado: %d | instante = %d", aux->pcb->id, aux->pcb->estado, aux->instante);
-        i++;
-        printf("\n");
-    }
-    free(aux);
+    //print de todos os processos introduzidos, descomentar para ver.
+    //debugPrint(p_id, processos);
+    
+    return 0;
 }
